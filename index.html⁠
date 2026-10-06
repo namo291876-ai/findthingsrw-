@@ -1,0 +1,463 @@
+<!-- ตั้งค่า CSS พื้นฐานและ Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Prompt', sans-serif;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.95)), #0f172a;
+        background-size: cover;
+        background-position: center;
+    }
+</style>
+
+<div class="bg-slate-900 min-h-screen text-slate-100 flex flex-col justify-between p-4 md:p-8 relative overflow-x-hidden">
+    
+    <!-- Header -->
+    <header id="main-header" class="flex justify-between items-center max-w-7xl mx-auto w-full z-10">
+        <div class="flex items-center space-x-3 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/20 shadow-xl">
+            <div class="w-10 h-10 bg-sky-500/20 border border-sky-400/40 rounded-xl flex items-center justify-center text-sky-300 font-bold text-lg">
+                ศ
+            </div>
+            <div>
+                <h1 class="font-bold text-sm md:text-base tracking-wide text-white">โรงเรียนศรีบุญเรืองวิทยาคาร</h1>
+                <p class="text-xs text-sky-200">ระบบติดตามของหาย ศ.ร.ว.</p>
+            </div>
+        </div>
+        
+        <button onclick="playClickSound(); triggerVibration(40); openGuideModal()" class="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow-lg border border-sky-400/30 flex items-center gap-2 active:scale-95">
+            <span>📖 คู่มือ</span>
+        </button>
+    </header>
+
+    <!-- Center Content: Login Form -->
+    <main class="flex-grow flex items-center justify-center my-6 z-10">
+        
+        <!-- Login Card -->
+        <div id="login-card" class="bg-slate-800/80 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl max-w-lg w-full mx-4 text-center">
+            <div class="inline-block p-3.5 bg-sky-500/20 rounded-2xl mb-4 text-sky-300 border border-sky-400/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <h2 class="text-xl md:text-2xl font-bold mb-2 text-white leading-relaxed">ยินดีต้อนรับเข้าสู่ ช่องทางค้นหาของหายภายในโรงเรียนศรีบุญเรืองวิทยาคาร</h2>
+            <p class="text-sky-200 text-xs md:text-sm mb-6">กรุณาเข้าสู่ระบบด้วยอีเมลโรงเรียนเพื่อใช้งาน</p>
+
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-medium text-slate-200 mb-1">E-mail โรงเรียน (@srw.ac.th)</label>
+                    <input type="email" id="email" required placeholder="sXXXXX@srw.ac.th" oninput="playTypingSound()" class="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:border-sky-400 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-200 mb-1">รหัสผ่าน</label>
+                    <div class="relative">
+                        <input type="password" id="password" required placeholder="••••••••" oninput="playTypingSound()" class="w-full px-4 py-3 pr-10 rounded-xl bg-black/40 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:border-sky-400 text-sm">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-3.5 text-slate-400 hover:text-white text-sm focus:outline-none">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg transition duration-200 active:scale-95">
+                    เข้าสู่ระบบ
+                </button>
+            </form>
+        </div>
+
+        <!-- Error Alert Modal -->
+        <div id="error-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-slate-800 border border-rose-500/40 p-6 rounded-3xl shadow-2xl max-w-sm w-full text-center">
+                <div class="w-14 h-14 bg-rose-500/20 border border-rose-500/40 rounded-full mx-auto flex items-center justify-center text-2xl mb-3">
+                    ⚠
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">เข้าสู่ระบบไม่สำเร็จ</h3>
+                <p class="text-sm text-rose-400 font-medium mb-6">รหัสผ่านหรืออีเมลไม่ถูกต้อง หรือไม่ใช่ Email โรงเรียนศรีบุญเรืองวิทยาคาร (@srw.ac.th)</p>
+                <button onclick="playClickSound(); resetLoginForm()" class="w-full py-3 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-semibold rounded-xl shadow-lg transition active:scale-95">
+                    ตกลง (เริ่มทำรายการใหม่)
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="hidden w-full max-w-5xl mx-auto space-y-6">
+            
+            <!-- Top Dashboard Bar -->
+            <div class="bg-slate-800/80 backdrop-blur-xl p-4 md:p-6 rounded-3xl border border-white/20 shadow-2xl flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-sky-500/30 border-2 border-sky-400 rounded-full flex items-center justify-center text-xl shadow-inner">
+                        🎓
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white">ยินดีต้อนรับสู่ระบบ ศ.ร.ว.</h2>
+                        <p class="text-xs text-sky-300" id="user-email-display"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <button onclick="playClickSound(); openReportModal()" class="flex-1 md:flex-none px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-sm font-semibold rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+                        <span>➕ แจ้งของหาย / พบของ</span>
+                    </button>
+                    <button onclick="playClickSound(); handleLogout()" class="px-4 py-2.5 bg-rose-500/80 hover:bg-rose-600 text-white text-sm font-semibold rounded-xl shadow-lg transition active:scale-95">
+                        ออกจากระบบ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search and Filter Bar -->
+            <div class="bg-slate-800/60 backdrop-blur-xl p-4 rounded-2xl border border-white/10 shadow-lg flex flex-col md:flex-row gap-3">
+                <div class="relative flex-grow">
+                    <input type="text" placeholder="ค้นหาชื่อสิ่งของ, สถานที่ หรือลักษณะ..." class="w-full px-4 py-3 pl-10 rounded-xl bg-black/40 border border-white/20 text-white placeholder-slate-400 focus:outline-none focus:border-sky-400 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <select class="px-4 py-3 rounded-xl bg-black/40 border border-white/20 text-white text-sm focus:outline-none focus:border-sky-400">
+                    <option value="">ทุกหมวดหมู่</option>
+                    <option value="card">บัตร / เอกสาร</option>
+                    <option value="electronics">อุปกรณ์อิเล็กทรอนิกส์</option>
+                    <option value="bag">กระเป๋า / เสื้อผ้า</option>
+                    <option value="other">อื่น ๆ</option>
+                </select>
+            </div>
+
+            <!-- Items Grid -->
+            <div id="items-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div id="empty-state" class="col-span-full text-center py-12 bg-slate-800/40 backdrop-blur-xl rounded-2xl border border-white/10">
+                    <p class="text-4xl mb-2">📭</p>
+                    <p class="text-sm text-slate-300 font-medium">ยังไม่มีรายการแจ้งของหายในขณะนี้</p>
+                    <p class="text-xs text-slate-400 mt-1">สามารถกดปุ่ม "แจ้งของหาย / พบของ" ด้านบนเพื่อเริ่มสร้างโพสต์ได้เลย</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal คู่มือการใช้งาน -->
+    <div id="guide-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-sky-500/40 p-6 rounded-3xl shadow-2xl max-w-md w-full text-left relative">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">📖</span>
+                    <h3 class="text-lg font-bold text-white">คู่มือการใช้งานระบบ</h3>
+                </div>
+                <button onclick="playClickSound(); closeGuideModal()" class="text-slate-400 hover:text-white text-xl font-bold">✕</button>
+            </div>
+            
+            <div class="space-y-3 bg-black/30 p-4 rounded-2xl border border-white/10 mb-6 text-xs text-slate-300 leading-relaxed">
+                <div class="flex items-start gap-2">
+                    <span class="text-sky-400 font-bold">1.</span>
+                    <p>กรุณาเข้าสู่ระบบด้วย<strong>อีเมลโรงเรียน (@srw.ac.th)</strong> ของนักเรียนหรือบุคลากรเท่านั้น</p>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-sky-400 font-bold">2.</span>
+                    <p>ตรวจสอบความถูกต้องของรหัสผ่านและอีเมลก่อนกดปุ่มเข้าสู่ระบบทุกครั้ง</p>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-sky-400 font-bold">3.</span>
+                    <p>สามารถกดปุ่ม <strong>"แจ้งของหาย / พบของ"</strong> เพื่อโพสต์ประกาศพร้อมแนบรูปภาพและช่องทางติดต่อส่วนตัว (IG, Facebook หรือ TikTok)</p>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="text-sky-400 font-bold">4.</span>
+                    <p>คลิกที่การ์ดรายการสิ่งของเพื่อดูรูปภาพขนาดใหญ่และรายละเอียดการติดต่อ</p>
+                </div>
+            </div>
+
+            <button onclick="playClickSound(); closeGuideModal()" class="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg transition active:scale-95">
+                เข้าใจแล้ว
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal ฟอร์มแจ้งของหาย -->
+    <div id="report-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-white/20 p-6 rounded-3xl shadow-2xl max-w-lg w-full text-left relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-white">📝 แจ้งข้อมูลของหาย / พบของหาย</h3>
+                <button onclick="closeReportModal()" class="text-slate-400 hover:text-white text-xl font-bold">✕</button>
+            </div>
+
+            <form id="reportForm" onsubmit="handleReportSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-200 mb-1">ประเภทการแจ้ง</label>
+                    <select id="report-type" class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/20 text-white text-sm focus:outline-none focus:border-sky-400">
+                        <option value="lost">🏷️ แจ้งของหาย</option>
+                        <option value="found">🔍 แจ้งพบของหาย</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-200 mb-1">ชื่อสิ่งของ</label>
+                    <input type="text" id="item-name" required placeholder="เช่น กระเป๋าเงิน, บัตรนักเรียน" class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-sky-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-200 mb-1">อัปโหลดรูปภาพสิ่งของ</label>
+                    <input type="file" id="item-image" accept="image/*" class="w-full text-xs text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-500/20 file:text-sky-300 hover:file:bg-sky-500/30 cursor-pointer">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-200 mb-1">สถานที่หาย / สถานที่พบ</label>
+                        <input type="text" id="item-location" required placeholder="เช่น โรงอาหาร, อาคาร 3" class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-sky-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-200 mb-1">เวลาที่หาย / พบ</label>
+                        <input type="text" id="item-time" placeholder="เช่น วันนี้ 12:30 น." class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-sky-400">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-200 mb-1">🎁 สินน้ำใจเล็ก ๆ น้อย ๆ (ถ้ามี)</label>
+                    <input type="text" id="item-reward" placeholder="เช่น ขอบคุณ 50 บาท" class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-sky-400">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-200 mb-1">📱 ช่องทางติดต่อ (IG / Facebook / TikTok อย่างน้อย 1 ช่องทาง)</label>
+                    <input type="text" id="item-contact" required placeholder="เช่น IG: @username หรือ FB: ชื่อจริง หรือ TikTok" class="w-full px-3 py-2.5 rounded-xl bg-black/40 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-sky-400">
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeReportModal()" class="w-1/2 py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-sm font-semibold rounded-xl transition">ยกเลิก</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold rounded-xl transition shadow-lg">ยืนยันการแจ้ง</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal แจ้งเตือนเมื่อโพสต์เสร็จสิ้น -->
+    <div id="success-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-sky-500/40 p-6 rounded-3xl shadow-2xl max-w-sm w-full text-center">
+            <div class="w-14 h-14 bg-emerald-500/20 border border-emerald-500/40 rounded-full mx-auto flex items-center justify-center text-2xl mb-3 text-emerald-400 shadow-inner">
+                ✓
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">โพสต์เสร็จสิ้นแล้ว</h3>
+            <p class="text-sm text-sky-200 font-medium mb-6">ระบบได้บันทึกและเผยแพร่ประกาศของคุณเรียบร้อยครับ</p>
+            <button onclick="playClickSound(); closeSuccessModal()" class="w-full py-3 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg transition active:scale-95">
+                ตกลง
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal สำหรับดูรายละเอียดและรูปภาพขนาดใหญ่ -->
+    <div id="detail-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-white/20 p-6 rounded-3xl shadow-2xl max-w-md w-full text-center relative">
+            <button onclick="closeDetailModal()" class="absolute right-4 top-4 text-slate-400 hover:text-white text-xl font-bold">✕</button>
+            <h3 id="detail-title" class="text-xl font-bold text-white mb-3">รายละเอียดสิ่งของ</h3>
+            
+            <div id="detail-image-container" class="mb-4 bg-black/40 rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center h-48">
+                <!-- รูปภาพจะถูกแทรกตรงนี้ -->
+            </div>
+
+            <div class="text-left space-y-2 bg-black/30 p-4 rounded-2xl border border-white/10 mb-4 text-xs text-slate-300">
+                <p><strong>สถานะ:</strong> <span id="detail-status"></span></p>
+                <p><strong>สถานที่:</strong> <span id="detail-location"></span></p>
+                <p><strong>เวลา:</strong> <span id="detail-time"></span></p>
+                <p><strong>สินน้ำใจ:</strong> <span id="detail-reward"></span></p>
+                <p class="text-sky-300"><strong>ช่องทางติดต่อ:</strong> <span id="detail-contact"></span></p>
+            </div>
+
+            <button onclick="closeDetailModal()" class="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold rounded-xl transition">ปิดหน้าต่าง</button>
+        </div>
+    </div>
+
+    <!-- Footer / Bottom Left: Creator Info Circle -->
+    <footer class="max-w-7xl mx-auto w-full flex justify-between items-end z-10">
+        <div class="relative group cursor-pointer" onclick="playClickSound(); triggerVibration(25);">
+            <div class="w-14 h-14 bg-gradient-to-tr from-sky-600 to-blue-400 rounded-full p-0.5 shadow-2xl flex items-center justify-center border-2 border-white/30 hover:scale-110 transition duration-300">
+                <span class="text-2xl">👨‍💻</span>
+            </div>
+            <div class="absolute bottom-16 left-0 bg-slate-900/95 backdrop-blur-md border border-white/20 p-4 rounded-2xl shadow-2xl w-72 hidden group-hover:block transition z-50 text-left">
+                <p class="font-bold text-sm text-white">ผู้สร้างเว็บไซต์</p>
+                <p class="text-xs text-sky-300 mt-1">ชื่อ: นายเจษฎาภรณ์ หันตุลา</p>
+                <p class="text-xs text-slate-300">ชั้น: ม.6 | โรงเรียนศรีบุญเรืองวิทยาคาร</p>
+                <div class="mt-2 pt-2 border-t border-white/10">
+                    <p class="text-[11px] font-semibold text-sky-200">✨ แรงบันดาลใจ:</p>
+                    <p class="text-[11px] text-slate-300 mt-0.5 leading-relaxed">ต้องการสร้างเว็บนี้เพื่อช่วยนักเรียน ศ.ร.ว. ทุกคนค้นหาของหายให้ง่ายขึ้น</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-xs text-slate-400 text-right">
+            <p>© 2026 Sriboonruang Wittayakarn School</p>
+        </div>
+    </footer>
+
+</div>
+
+<!-- JavaScript -->
+<script>
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let currentUserEmail = '';
+
+    function playClickSound() {
+        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
+    }
+
+    function playTypingSound() {
+        if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.03);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.03);
+    }
+
+    function triggerVibration(duration) {
+        if ("vibrate" in navigator) { navigator.vibrate(duration); }
+    }
+
+    function togglePasswordVisibility() {
+        playClickSound();
+        const passwordInput = document.getElementById('password');
+        passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+    }
+
+    function openGuideModal() {
+        document.getElementById('guide-modal').classList.remove('hidden');
+    }
+
+    function closeGuideModal() {
+        document.getElementById('guide-modal').classList.add('hidden');
+    }
+
+    function handleLogin(event) {
+        event.preventDefault();
+        playClickSound();
+        triggerVibration(50);
+        
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        
+        if (!email.endsWith('@srw.ac.th')) {
+            document.getElementById('error-modal').classList.remove('hidden');
+            return;
+        }
+
+        currentUserEmail = email;
+        document.getElementById('user-email-display').innerText = currentUserEmail;
+        document.getElementById('login-card').classList.add('hidden');
+        document.getElementById('main-header').classList.add('hidden');
+        document.getElementById('dashboard-section').classList.remove('hidden');
+    }
+
+    function resetLoginForm() {
+        document.getElementById('error-modal').classList.add('hidden');
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('password').type = 'password';
+        document.getElementById('email').focus();
+    }
+
+    function handleLogout() {
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('password').type = 'password';
+        document.getElementById('dashboard-section').classList.add('hidden');
+        document.getElementById('login-card').classList.remove('hidden');
+        document.getElementById('main-header').classList.remove('hidden');
+    }
+
+    function openReportModal() {
+        document.getElementById('report-modal').classList.remove('hidden');
+    }
+
+    function closeReportModal() {
+        document.getElementById('report-modal').classList.add('hidden');
+    }
+
+    function closeSuccessModal() {
+        document.getElementById('success-modal').classList.add('hidden');
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detail-modal').classList.add('hidden');
+    }
+
+    function handleReportSubmit(event) {
+        event.preventDefault();
+        playClickSound();
+        triggerVibration(50);
+
+        const type = document.getElementById('report-type').value;
+        const name = document.getElementById('item-name').value;
+        const location = document.getElementById('item-location').value;
+        const time = document.getElementById('item-time').value || 'เร็ว ๆ นี้';
+        const reward = document.getElementById('item-reward').value || 'ไม่มี';
+        const contact = document.getElementById('item-contact').value;
+        const imageFile = document.getElementById('item-image').files[0];
+
+        // ซ่อนข้อความสถานะว่างเปล่า
+        const emptyState = document.getElementById('empty-state');
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        const isLost = type === 'lost';
+        const badgeClass = isLost ? 'bg-amber-500/20 text-amber-300 border-amber-400/30' : 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30';
+        const badgeText = isLost ? '🏷️ ของหาย' : '🔍 พบของหาย';
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const imageUrl = e.target.result;
+            createCard(badgeClass, badgeText, name, location, time, reward, contact, imageUrl);
+        };
+
+        if (imageFile) {
+            reader.readAsDataURL(imageFile);
+        } else {
+            createCard(badgeClass, badgeText, name, location, time, reward, contact, 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=400&auto=format&fit=crop&q=60');
+        }
+
+        closeReportModal();
+        document.getElementById('reportForm').reset();
+        
+        // แสดง Modal แจ้งเตือนโพสต์เสร็จสิ้น
+        document.getElementById('success-modal').classList.remove('hidden');
+    }
+
+    function createCard(badgeClass, badgeText, name, location, time, reward, contact, imageUrl) {
+        const grid = document.getElementById('items-grid');
+        const newCard = document.createElement('div');
+        newCard.className = 'bg-slate-800/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-xl flex flex-col justify-between hover:border-sky-400/50 transition cursor-pointer';
+        
+        newCard.onclick = function() {
+            playClickSound();
+            document.getElementById('detail-title').innerText = name;
+            document.getElementById('detail-status').innerText = badgeText;
+            document.getElementById('detail-location').innerText = location;
+            document.getElementById('detail-time').innerText = time;
+            document.getElementById('detail-reward').innerText = reward;
+            document.getElementById('detail-contact').innerText = contact;
+            
+            document.getElementById('detail-image-container').innerHTML = `<img src="${imageUrl}" class="w-full h-full object-cover">`;
+            document.getElementById('detail-modal').classList.remove('hidden');
+        };
+
+        newCard.innerHTML = `
+            <div>
+                <div class="h-32 bg-black/40 rounded-xl overflow-hidden mb-3 border border-white/10">
+                    <img src="${imageUrl}" class="w-full h-full object-cover">
+                </div>
+                <div class="flex justify-between items-start mb-2">
+                    <span class="px-2.5 py-0.5 ${badgeClass} border text-[11px] font-medium rounded-full">${badgeText}</span>
+                    <span class="text-xs text-slate-400">${location}</span>
+                </div>
+                <h3 class="font-bold text-base text-white mb-1 truncate">${name}</h3>
+                <p class="text-xs text-slate-300 mb-2">🕒 ${time}</p>
+            </div>
+            <div class="pt-2 border-t border-white/10 flex justify-between items-center text-xs text-sky-300">
+                <span>📱 ติดต่อ: ${contact}</span>
+                <span class="text-[10px] bg-sky-500/20 px-2 py-1 rounded-lg border border-sky-400/30">คลิกดูรูป/รายละเอียด</span>
+            </div>
+        `;
+
+        grid.prepend(newCard);
+    }
+</script>
